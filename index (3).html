@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Black Ink Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#0d0d0d;--bg3:#131313;--bg4:#1a1a1a;
+  --card:rgba(13,13,13,0.95);
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);
+  --border-o:rgba(255,140,0,0.35);
+  --o1:#FF8C00;--o2:#FF6B00;--o3:#FFB347;
+  --og1:rgba(255,140,0,0.15);--og2:rgba(255,140,0,0.08);--og3:rgba(255,140,0,0.04);
+  --t1:#F2EDE8;--t2:#A8A09A;--t3:#5C5550;--t4:#2E2B28;
+  --red:#FF3B3B;--green:#00CC88;--blue:#0099FF;
+  --f1:'Montserrat',sans-serif;--f2:'Inter',sans-serif;--f3:'JetBrains Mono',monospace;
+  --sh:0 4px 28px rgba(0,0,0,0.7);--ease:cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="light"]{
+  --bg:#F7F4F0;--bg2:#EEE9E3;--bg3:#E5DFD8;--bg4:#DDD6CE;
+  --card:rgba(255,252,248,0.96);--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.04);
+  --t1:#1A1714;--t2:#5C5450;--t3:#9A958F;--t4:#C8C3BC;
+}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--f2);-webkit-font-smoothing:antialiased}
+#root{min-height:100vh}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,140,0,.3);border-radius:2px}
+::selection{background:rgba(255,140,0,.2)}
+input:-webkit-autofill,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px var(--bg2) inset;-webkit-text-fill-color:var(--t1)}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;overflow:hidden;transition:opacity .8s,visibility .8s}
+#splash.out{opacity:0;visibility:hidden;pointer-events:none}
+#sp-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,140,0,.1) 0%,transparent 70%);animation:glowP 3s ease-in-out infinite}
+@keyframes glowP{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.2);opacity:1}}
+.sp-ring{position:absolute;border-radius:50%;border:1px solid transparent;animation:spinR var(--d,2s) linear infinite var(--dir,normal)}
+.sr1{width:160px;height:160px;border-top-color:#FF8C00;border-right-color:rgba(255,140,0,.15);--d:1.8s}
+.sr2{width:205px;height:205px;border-bottom-color:#FF6B00;border-left-color:rgba(255,107,0,.1);--d:3s;--dir:reverse}
+.sr3{width:258px;height:258px;border-top-color:rgba(255,140,0,.06);--d:4.5s}
+@keyframes spinR{to{transform:rotate(360deg)}}
+#sp-logo{position:relative;z-index:1;text-align:center;animation:logoIn .9s .2s cubic-bezier(.16,1,.3,1) both}
+@keyframes logoIn{from{opacity:0;transform:translateY(22px) scale(.95)}to{opacity:1;transform:none}}
+#sp-wm{font-family:var(--f1);font-size:clamp(2rem,6vw,3rem);font-weight:900;letter-spacing:10px;color:#fff;text-shadow:0 0 60px rgba(255,140,0,.35)}
+#sp-sub{font-size:.5rem;letter-spacing:10px;color:#FF8C00;margin-top:.3rem;font-weight:600;opacity:0;animation:fi .6s 1s ease forwards}
+#sp-line{width:0;height:1px;background:linear-gradient(90deg,transparent,#FF8C00,#FF6B00,transparent);margin:.8rem auto;animation:lineW .8s .5s ease forwards}
+@keyframes lineW{to{width:80px;opacity:1}}@keyframes fi{to{opacity:1}}
+#sp-tag{font-size:.48rem;letter-spacing:4px;color:#333;opacity:0;animation:fi .6s 1.2s ease forwards}
+#sp-prog{position:absolute;bottom:80px;width:230px;display:flex;flex-direction:column;align-items:center;gap:.65rem;opacity:0;animation:fi .5s .6s ease forwards}
+#sp-track{width:100%;height:1px;background:#111;overflow:hidden}
+#sp-fill{height:100%;width:0%;background:linear-gradient(90deg,#FF8C00,#FF4500);transition:width .1s linear}
+#sp-status{font-size:.5rem;letter-spacing:3px;color:#2a2a2a}
+#sp-copy{position:absolute;bottom:1.75rem;font-size:.45rem;letter-spacing:3px;color:#1a1a1a;opacity:0;animation:fi .5s 1.4s ease forwards}
+.sp-corner{position:absolute;width:22px;height:22px;opacity:0;animation:fi .5s 1s ease forwards}
+.sc-tl{top:1.5rem;left:1.5rem;border-top:1px solid rgba(255,140,0,.2);border-left:1px solid rgba(255,140,0,.2)}
+.sc-tr{top:1.5rem;right:1.5rem;border-top:1px solid rgba(255,140,0,.2);border-right:1px solid rgba(255,140,0,.2)}
+.sc-bl{bottom:1.5rem;left:1.5rem;border-bottom:1px solid rgba(255,140,0,.1);border-left:1px solid rgba(255,140,0,.1)}
+.sc-br{bottom:1.5rem;right:1.5rem;border-bottom:1px solid rgba(255,140,0,.1);border-right:1px solid rgba(255,140,0,.1)}
+
+/* APP GLOBAL */
+.navbar{position:sticky;top:0;z-index:200;background:rgba(5,5,5,.96);backdrop-filter:blur(28px);border-bottom:1px solid var(--border);height:58px}
+[data-theme="light"] .navbar{background:rgba(247,244,240,.96)}
+.nb-inner{max-width:1200px;margin:0 auto;padding:0 1.25rem;height:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nb-brand{display:flex;align-items:baseline;gap:.4rem;cursor:pointer;flex-shrink:0}
+.nb-wm{font-family:var(--f1);font-size:1.1rem;font-weight:900;letter-spacing:3px;color:var(--t1)}
+.nb-gl{font-size:.42rem;letter-spacing:5px;color:var(--o1);font-weight:700}
+.nb-search{flex:1;max-width:300px;position:relative}
+.nb-si{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.82rem;pointer-events:none}
+.nb-inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.44rem 1rem .44rem 2.1rem;color:var(--t1);font-size:.82rem;outline:none;transition:border-color .15s}
+.nb-inp:focus{border-color:var(--border-o)}
+.nb-tabs{display:flex;gap:.1rem}
+.tab{background:transparent;border:1px solid transparent;color:var(--t3);padding:.35rem .7rem;border-radius:6px;font-size:.62rem;letter-spacing:1px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--f2)}
+.tab:hover{color:var(--t2);background:var(--og3)}
+.tab.on{color:var(--o1);background:var(--og3);border-color:rgba(255,140,0,.18)}
+.nb-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.nb-notif{position:relative}
+.nb-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--o1);color:#050505;border-radius:50%;font-size:.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+.admin-chip{font-size:.5rem;color:var(--o1);border:1px solid rgba(255,140,0,.3);padding:.18rem .5rem;border-radius:3px;letter-spacing:2px;font-weight:700}
+
+/* LAYOUT */
+.layout{max-width:1200px;margin:0 auto;padding:1.25rem;display:grid;grid-template-columns:235px 1fr 275px;gap:1.25rem}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}.sl,.sr{display:none}}
+@media(max-width:680px){.layout{padding:.6rem}.nb-tabs,.nb-search{display:none}}
+.sidebar{position:sticky;top:70px;height:fit-content;max-height:calc(100vh - 80px);overflow-y:auto;display:flex;flex-direction:column;gap:.75rem}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;backdrop-filter:blur(16px)}
+.slbl{font-size:.55rem;letter-spacing:3px;color:var(--t4);margin-bottom:.85rem;font-weight:700}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;position:relative}
+.auth-orb{position:fixed;top:25%;left:50%;transform:translateX(-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(255,140,0,.06) 0%,transparent 70%);pointer-events:none}
+.auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.75rem 2.5rem;box-shadow:var(--sh);backdrop-filter:blur(24px);animation:authIn .65s var(--ease) both}
+@keyframes authIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+.auth-wm{font-family:var(--f1);font-size:1.9rem;font-weight:900;letter-spacing:5px;color:var(--t1)}
+.auth-sub{font-size:.5rem;letter-spacing:8px;color:var(--o1);font-weight:600;margin-top:.25rem}
+.auth-rule{height:1px;background:linear-gradient(90deg,transparent,var(--o1),var(--o2),transparent);margin:1.25rem 0;width:0;animation:ruleG .8s .4s ease forwards}
+@keyframes ruleG{to{width:100%;opacity:1}}
+.auth-lbl{font-size:.6rem;letter-spacing:3px;color:var(--t3);text-align:center;margin-bottom:1.5rem;font-weight:600}
+.field{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.85rem 1.1rem;color:var(--t1);font-size:.9rem;outline:none;transition:border-color .15s,box-shadow .15s;margin-bottom:.85rem;font-family:var(--f2)}
+.field:focus{border-color:var(--border-o);box-shadow:0 0 0 3px rgba(255,140,0,.08)}
+.field::placeholder{color:var(--t3)}
+.auth-err{color:var(--red);font-size:.78rem;padding:.6rem .85rem;background:rgba(255,59,59,.05);border-radius:8px;border:1px solid rgba(255,59,59,.12);margin-bottom:.75rem;animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:all .14s var(--ease);letter-spacing:.3px;font-family:var(--f2)}
+.btn:active{transform:scale(.96)}
+.btn-p{background:var(--o1);color:#050505;padding:.75rem 1.5rem;font-size:.85rem;letter-spacing:1.5px;box-shadow:0 4px 24px rgba(255,140,0,.35)}
+.btn-p:hover{background:var(--o2);box-shadow:0 6px 32px rgba(255,140,0,.5);transform:translateY(-1px)}
+.btn-g{background:transparent;color:var(--t2);border:1px solid var(--border);padding:.65rem 1.3rem;font-size:.82rem}
+.btn-g:hover{border-color:var(--border-o);color:var(--o1)}
+.btn-d{background:rgba(255,59,59,.08);color:var(--red);border:1px solid rgba(255,59,59,.2);padding:.38rem .85rem;font-size:.7rem}
+.btn-d:hover{background:rgba(255,59,59,.15)}
+.btn-sm{padding:.32rem .75rem!important;font-size:.7rem!important;border-radius:7px!important}
+.btn-fw{width:100%}
+.icon-btn{padding:.44rem;background:transparent;border:none;color:var(--t2);font-size:1rem;border-radius:7px;cursor:pointer;transition:all .14s}
+.icon-btn:hover{background:var(--og3);color:var(--o1)}
+
+/* PROFILE WIDGET */
+.pw-banner{height:55px;background:linear-gradient(135deg,rgba(255,140,0,.2),rgba(255,107,0,.05));border-radius:12px 12px 0 0}
+.pw-body{padding:0 1rem 1rem}
+.pw-avi{margin-top:-22px;margin-bottom:.5rem}
+.pw-name{font-size:.95rem;font-weight:700;color:var(--t1)}
+.pw-bio{font-size:.72rem;color:var(--t3);margin-top:2px;line-height:1.5}
+.pw-stats{display:flex;gap:1.25rem;margin-top:.85rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.ps-v{font-family:var(--f1);font-size:1.05rem;font-weight:700;color:var(--o1)}
+.ps-l{font-size:.55rem;letter-spacing:1px;color:var(--t4);font-weight:600}
+
+/* NAV ITEMS */
+.nav-item{display:flex;align-items:center;gap:.65rem;padding:.55rem .7rem;border-radius:10px;color:var(--t2);font-size:.88rem;cursor:pointer;transition:all .14s;background:transparent;border:none;width:100%;text-align:left;font-family:var(--f2);margin-bottom:.1rem}
+.nav-item:hover{background:var(--og3);color:var(--t1)}
+.nav-item.on{background:var(--og2);color:var(--o1);border:1px solid rgba(255,140,0,.15)}
+
+/* STORIES */
+.stories{display:flex;gap:.75rem;overflow-x:auto;padding:.2rem 0 .85rem;scrollbar-width:none;margin-bottom:1rem}
+.stories::-webkit-scrollbar{display:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:.4rem;cursor:pointer;flex-shrink:0}
+.story-ring{width:58px;height:58px;border-radius:50%;padding:2.5px;transition:transform .14s,box-shadow .14s}
+.story-ring:hover{transform:scale(1.07);box-shadow:0 4px 20px rgba(255,140,0,.4)}
+.story-ring.seen{background:var(--t4)!important}
+.story-inner{width:100%;height:100%;border-radius:50%;background:var(--bg3);border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--o1)}
+.story-name{font-size:.6rem;color:var(--t2);max-width:58px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* COMPOSER */
+.composer{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:1rem;backdrop-filter:blur(16px)}
+.comp-ta{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.75rem .9rem;color:var(--t1);font-size:.88rem;min-height:78px;resize:none;outline:none;transition:border-color .15s;line-height:1.8;font-family:var(--f2)}
+.comp-ta:focus{border-color:var(--border-o);box-shadow:0 0 0 3px rgba(255,140,0,.07)}
+.comp-ta::placeholder{color:var(--t3)}
+.comp-row{display:flex;justify-content:space-between;align-items:center;margin-top:.65rem;flex-wrap:wrap;gap:.5rem}
+.cat-chip{padding:.25rem .7rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--t3);font-size:.68rem;cursor:pointer;transition:all .14s;font-family:var(--f2)}
+.cat-chip.on{border-color:var(--o1);background:var(--og2);color:var(--o1)}
+.char-c{font-size:.68rem;color:var(--t4)}
+.char-c.warn{color:var(--red)}
+.fb{font-size:.73rem}
+.fb.ok{color:var(--green)}
+.fb.warn{color:#F0A500}
+
+/* FILTER */
+.filters{display:flex;gap:.35rem;margin-bottom:.85rem;flex-wrap:wrap}
+.fchip{display:flex;align-items:center;gap:.35rem;padding:.26rem .82rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--t3);font-size:.68rem;cursor:pointer;transition:all .14s;font-family:var(--f2);font-weight:500}
+.fchip:hover{border-color:var(--border-o);color:var(--t2)}
+.fchip.on{border-color:var(--o1);background:var(--og3);color:var(--o1)}
+.fcnt{background:rgba(255,255,255,.04);border-radius:20px;padding:.05rem .3rem;font-size:.58rem;color:var(--t4)}
+
+/* POST CARD */
+.post{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:.75rem;backdrop-filter:blur(16px);box-shadow:var(--sh);transition:border-color .15s,box-shadow .15s;animation:pIn .4s var(--ease) both}
+.post:hover{border-color:var(--border-o);box-shadow:0 8px 40px rgba(255,140,0,.1)}
+.post.flagged{border-color:rgba(255,59,59,.18)}
+@keyframes pIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem}
+.pu{display:flex;gap:.65rem;align-items:center;cursor:pointer}
+.pu:hover .pname{color:var(--o1)}
+.pname{font-size:.9rem;font-weight:700;color:var(--t1);transition:color .14s}
+.pmeta{font-size:.68rem;color:var(--t3);margin-top:1px}
+.pbadges{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.ctag{font-size:.56rem;letter-spacing:1px;padding:.13rem .46rem;border-radius:3px;font-weight:700}
+.tc{color:var(--blue);border:1px solid rgba(0,153,255,.2);background:rgba(0,153,255,.06)}
+.mc{color:var(--o1);border:1px solid rgba(255,140,0,.2);background:rgba(255,140,0,.06)}
+.sc{color:var(--green);border:1px solid rgba(0,204,136,.2);background:rgba(0,204,136,.06)}
+.vc{color:var(--red);border:1px solid rgba(255,59,59,.2);background:rgba(255,59,59,.06)}
+.ftag{font-size:.52rem;color:var(--red);border:1px solid rgba(255,59,59,.2);padding:.1rem .36rem;border-radius:3px;letter-spacing:1px}
+.lbtn{background:transparent;border:none;color:var(--red);font-size:.95rem;cursor:pointer;opacity:.7;transition:all .14s}
+.lbtn:hover{opacity:1;transform:scale(1.15)}
+.pbody{color:var(--t1);line-height:1.85;font-size:.88rem;margin-bottom:.85rem}
+
+/* CODE BLOCK */
+.code-wrap{border-radius:10px;overflow:hidden;margin:.75rem 0;border:1px solid var(--border)}
+.code-hdr{background:var(--bg4);padding:.45rem .85rem;display:flex;align-items:center;justify-content:space-between}
+.code-dots{display:flex;gap:.35rem}
+.cd{width:8px;height:8px;border-radius:50%}
+.code-lang{font-size:.54rem;letter-spacing:2px;color:var(--o3);font-weight:700}
+.code-body{background:var(--bg);padding:1rem 1.1rem;font-family:var(--f3);font-size:.78rem;color:#FFB347;overflow-x:auto;line-height:1.65;white-space:pre}
+
+/* REACTIONS */
+.pactions{display:flex;border-top:1px solid var(--border);padding-top:.6rem;position:relative}
+.abtn{flex:1;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.4rem .25rem;border-radius:7px;transition:all .14s;font-family:var(--f2)}
+.abtn:hover{color:var(--t1);background:var(--og3)}
+.abtn.reacted{color:var(--o1)}
+.abtn.shared{color:var(--green)}
+.aem{font-size:.95rem;transition:transform .14s}
+.abtn:hover .aem{transform:scale(1.25)}
+.albl{font-size:.68rem;opacity:.7}
+.acnt{font-size:.72rem}
+.rpicker{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:40px;padding:.4rem .75rem;display:flex;gap:.5rem;box-shadow:0 20px 60px rgba(0,0,0,.7);backdrop-filter:blur(24px);z-index:100;white-space:nowrap;animation:picIn .2s var(--ease)}
+@keyframes picIn{from{opacity:0;transform:translateX(-50%) scale(.85) translateY(4px)}to{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}}
+.ropt{font-size:1.5rem;cursor:pointer;border:none;background:none;padding:.2rem;border-radius:50%;transition:transform .14s}
+.ropt:hover{transform:scale(1.35) translateY(-4px)}
+.rsummary{display:flex;align-items:center;gap:.5rem;padding:.3rem 0}
+
+/* COMMENTS */
+.carea{margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem}
+.citem{display:flex;gap:.5rem;margin-bottom:.6rem}
+.cbubble{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:.5rem .75rem}
+.cauthor{color:var(--o1);font-size:.72rem;font-weight:700;margin-bottom:.2rem;cursor:pointer}
+.ctext{color:var(--t2);font-size:.83rem;line-height:1.65}
+.cfoot{display:flex;align-items:center;gap:.75rem;margin-top:.25rem}
+.ctime{font-size:.62rem;color:var(--t4)}
+.rbtn{background:none;border:none;color:var(--t4);font-size:.65rem;cursor:pointer}
+.rbtn:hover{color:var(--o1)}
+.delbtn{background:none;border:none;color:var(--red);font-size:.65rem;cursor:pointer;opacity:.5}
+.delbtn:hover{opacity:1}
+.cinput-row{display:flex;gap:.5rem;align-items:center;margin-top:.6rem}
+.cinput{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.5rem .85rem;color:var(--t1);font-size:.82rem;outline:none;transition:border-color .15s;font-family:var(--f2)}
+.cinput:focus{border-color:var(--border-o)}
+.cinput::placeholder{color:var(--t4)}
+
+/* PAGINATION */
+.pager{display:flex;gap:.35rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;align-items:center}
+.pg{padding:.33rem .68rem;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--t3);cursor:pointer;font-size:.73rem;transition:all .14s;min-width:30px;font-family:var(--f2)}
+.pg:hover:not(:disabled){border-color:var(--border-o);color:var(--o1)}
+.pg.cur{border-color:var(--o1);background:var(--og3);color:var(--o1)}
+.pg:disabled{color:var(--t4);cursor:default;opacity:.35}
+
+/* GALLERY */
+.masonry{columns:3 260px;column-gap:.85rem}
+.mitem{break-inside:avoid;margin-bottom:.85rem;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:transform .25s,border-color .15s}
+.mitem:hover{transform:scale(1.012);border-color:var(--border-o)}
+.mface{position:relative}
+.minner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1rem}
+.mtext{font-size:.78rem;line-height:1.8;text-align:center}
+.mfoot{padding:.62rem .82rem;display:flex;justify-content:space-between;align-items:center}
+.mauthor{font-size:.7rem;font-weight:700}
+.mlikes{font-size:.63rem;color:var(--t4)}
+
+/* MARKET */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.85rem}
+.mcard{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .14s;backdrop-filter:blur(16px)}
+.mcard:hover{border-color:var(--border-o);transform:translateY(-3px);box-shadow:0 8px 40px rgba(255,140,0,.1)}
+.mthumb{height:130px;display:flex;align-items:center;justify-content:center;font-size:2.4rem}
+.mbody{padding:1rem}
+.mlbl{font-size:.56rem;letter-spacing:2px;color:var(--o1);margin-bottom:.5rem;font-weight:700}
+.mtext2{color:var(--t2);font-size:.82rem;line-height:1.65;margin-bottom:.75rem}
+.mfooter{display:flex;justify-content:space-between;align-items:center}
+.mby{color:var(--t4);font-size:.7rem}
+
+/* MESSAGES */
+.inbox-wrap{display:flex;gap:.85rem;height:calc(100vh - 100px)}
+.inbox-list{width:245px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;flex-shrink:0;backdrop-filter:blur(16px);display:flex;flex-direction:column}
+.inbox-hdr{padding:.85rem 1rem;border-bottom:1px solid var(--border);font-size:.56rem;letter-spacing:3px;color:var(--t3);font-weight:700;flex-shrink:0}
+.contacts{overflow-y:auto;flex:1}
+.contact{padding:.7rem .85rem;cursor:pointer;border-bottom:1px solid var(--border2);display:flex;gap:.5rem;align-items:center;transition:background .14s}
+.contact:hover{background:var(--og3)}
+.contact.on{background:var(--og3)}
+.cname{color:var(--t1);font-size:.83rem;font-weight:600}
+.cprev{color:var(--t4);font-size:.65rem;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.chat-pane{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;backdrop-filter:blur(16px)}
+.chat-hdr{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:.65rem;align-items:center;flex-shrink:0}
+.chat-nm{color:var(--t1);font-size:.9rem;font-weight:700}
+.chat-online{color:var(--green);font-size:.65rem}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.5rem}
+.msg{max-width:70%;padding:.55rem .9rem;border-radius:10px;font-size:.85rem;line-height:1.6;color:var(--t1)}
+.msg.s{background:var(--og1);border:1px solid rgba(255,140,0,.2);align-self:flex-end}
+.msg.r{background:var(--bg2);border:1px solid var(--border);align-self:flex-start}
+.msg-time{font-size:.58rem;color:var(--t4);margin-top:.15rem}
+.chat-input-row{padding:.85rem;border-top:1px solid var(--border);display:flex;gap:.5rem;flex-shrink:0}
+.chat-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.6rem .9rem;color:var(--t1);font-size:.85rem;outline:none;transition:border-color .15s;font-family:var(--f2)}
+.chat-inp:focus{border-color:var(--border-o)}
+.chat-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--t4);font-size:.88rem;font-style:italic}
+
+/* NOTIF PANEL */
+.npanel{position:fixed;top:62px;right:1rem;width:340px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.7);z-index:350;backdrop-filter:blur(28px);animation:dropIn .22s var(--ease);max-height:480px;overflow-y:auto}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.nhdr{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
+.ntitle{font-size:.6rem;letter-spacing:3px;color:var(--t3);font-weight:700}
+.nitem{padding:.75rem 1rem;border-bottom:1px solid var(--border2);display:flex;gap:.65rem;align-items:flex-start;cursor:pointer;transition:background .14s}
+.nitem:hover{background:var(--og3)}
+.nitem.unread{background:var(--og3)}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--o1);margin-top:6px;flex-shrink:0}
+.ntext{font-size:.82rem;color:var(--t2);line-height:1.5}
+.nfrom{color:var(--t1);font-weight:700}
+.ntime{font-size:.63rem;color:var(--t4);margin-top:2px}
+
+/* SETTINGS */
+.sp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;justify-content:flex-end;backdrop-filter:blur(4px)}
+.sp-panel{width:315px;background:var(--bg2);border-left:1px solid var(--border);height:100%;overflow-y:auto;animation:slideR .3s var(--ease)}
+@keyframes slideR{from{transform:translateX(100%)}to{transform:none}}
+.sp-hd{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg2)}
+.sp-title{font-size:.6rem;letter-spacing:4px;color:var(--t3);font-weight:700}
+.sp-sec{padding:1.25rem;border-bottom:1px solid var(--border)}
+.sp-lbl{font-size:.55rem;letter-spacing:3px;color:var(--t4);margin-bottom:.85rem;font-weight:700}
+.sp-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0}
+.sp-rl{color:var(--t2);font-size:.85rem}
+.sp-rv{color:var(--o1);font-size:.75rem;font-weight:600}
+.sp-info{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1rem;color:var(--t3);font-size:.78rem;line-height:1.9}
+.toggle{width:42px;height:22px;border-radius:11px;background:var(--t4);cursor:pointer;position:relative;transition:background .25s;border:none;flex-shrink:0}
+.toggle.on{background:var(--o1)}
+.tknob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .25s var(--ease);box-shadow:0 1px 4px rgba(0,0,0,.4);pointer-events:none}
+.toggle.on .tknob{left:22px}
+
+/* ADMIN */
+.admin-hd-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.admin-title{font-family:var(--f1);font-size:1.6rem;font-weight:700;color:var(--o1);letter-spacing:2px}
+.admin-sub{font-size:.6rem;letter-spacing:2px;color:var(--t4);margin-top:3px;font-weight:600}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:.75rem;margin-bottom:1.75rem}
+.stat-box{background:var(--card);border-radius:12px;padding:1.1rem;text-align:center;backdrop-filter:blur(16px);border:1px solid var(--border);transition:all .14s}
+.stat-box:hover{border-color:var(--border-o)}
+.stat-val{font-family:var(--f1);font-size:1.9rem;font-weight:700}
+.stat-lbl{font-size:.58rem;letter-spacing:2px;color:var(--t4);margin-top:3px;font-weight:700}
+.atabs{display:flex;gap:.4rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.atab{padding:.4rem 1rem;border:1px solid var(--border);background:transparent;color:var(--t3);border-radius:6px;cursor:pointer;font-size:.62rem;letter-spacing:1px;font-weight:600;transition:all .14s;font-family:var(--f2)}
+.atab:hover{border-color:var(--border-o);color:var(--t2)}
+.atab.on{border-color:var(--o1);background:var(--og3);color:var(--o1)}
+.fcard{background:var(--card);border:1px solid rgba(255,59,59,.18);border-radius:12px;padding:1.1rem;margin-bottom:.65rem;backdrop-filter:blur(16px)}
+.flbl{font-size:.58rem;letter-spacing:1.5px;color:var(--red);margin-bottom:.35rem;font-weight:700}
+.fuser{color:var(--o1);font-size:.9rem;font-weight:700}
+.fkw{color:var(--t4);font-size:.68rem;margin-top:2px}
+.fquote{background:var(--bg);border-left:2px solid rgba(255,59,59,.28);padding:.65rem .85rem;border-radius:0 6px 6px 0;color:var(--t3);font-size:.82rem;line-height:1.75;margin-top:.65rem}
+.urow{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;backdrop-filter:blur(16px);transition:border-color .14s}
+.urow:hover{border-color:var(--border-o)}
+.urow.sus{border-color:rgba(255,59,59,.2)}
+.unm{color:var(--t1);font-size:.85rem;font-weight:600}
+.uph{color:var(--t4);font-size:.68rem}
+.sus-badge{font-size:.52rem;color:var(--red);border:1px solid rgba(255,59,59,.25);padding:.1rem .36rem;border-radius:3px;letter-spacing:1px;font-weight:700}
+
+/* SUSPENDED */
+.sus-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.sus-card{text-align:center;max-width:460px;border:1px solid rgba(255,59,59,.22);padding:3rem 2.5rem;border-radius:20px;background:var(--card);backdrop-filter:blur(24px);box-shadow:var(--sh)}
+.sus-icon{font-size:3.5rem;margin-bottom:1.25rem;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.sus-title{color:var(--red);font-family:var(--f1);font-size:1.15rem;letter-spacing:3px;font-weight:700;margin-bottom:1rem}
+.sus-text{color:var(--t3);line-height:1.9;font-size:.88rem;margin-bottom:2rem}
+
+/* MISC */
+.page-hd{text-align:center;margin-bottom:2rem}
+.page-ey{font-size:.52rem;letter-spacing:6px;color:var(--t4);font-weight:700}
+.page-ti{font-family:var(--f1);font-size:2rem;font-weight:700;letter-spacing:2px;color:var(--t1);margin-top:.5rem}
+.page-rule{width:48px;height:1px;background:linear-gradient(90deg,var(--o1),var(--o2));margin:.85rem auto 0}
+.empty{color:var(--t4);text-align:center;padding:3rem;font-style:italic;font-size:.88rem}
+.back-btn{display:inline-flex;align-items:center;gap:.5rem;color:var(--t2);font-size:.82rem;cursor:pointer;margin-bottom:1rem;background:none;border:none;transition:color .14s;font-family:var(--f2)}
+.back-btn:hover{color:var(--o1)}
+.trend-item{display:flex;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border2)}
+.trank{font-family:var(--f1);font-size:.95rem;font-weight:700;color:var(--o1);min-width:20px}
+.ttext{color:var(--t2);font-size:.78rem;line-height:1.5}
+.tmeta{color:var(--t4);font-size:.63rem;margin-top:2px}
+.search-dd{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.7);z-index:400;overflow:hidden;backdrop-filter:blur(24px);animation:dropIn .2s var(--ease)}
+.sdlbl{padding:.5rem 1rem .25rem;font-size:.54rem;letter-spacing:3px;color:var(--t4);font-weight:700}
+.sditem{padding:.7rem 1rem;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .14s}
+.sditem:hover{background:var(--og3)}
+.sdauthor{font-size:.7rem;font-weight:700;color:var(--o1);margin-bottom:.15rem}
+.sdtext{font-size:.8rem;color:var(--t2)}
+.ext-badge{font-size:.54rem;color:var(--o3);border:1px solid rgba(255,140,0,.2);padding:.08rem .33rem;border-radius:3px;letter-spacing:1px;margin-left:.5rem}
+.tl-banner{height:140px;background:linear-gradient(135deg,rgba(255,140,0,.2),rgba(255,107,0,.05))}
+.tl-body{padding:0 1.5rem 1.5rem}
+.tl-avi{margin-top:-36px;margin-bottom:.75rem}
+.tl-name{font-family:var(--f1);font-size:1.4rem;font-weight:700;color:var(--t1)}
+.tl-bio{color:var(--t2);font-size:.85rem;line-height:1.65;margin-top:.35rem;max-width:500px}
+.tl-stats{display:flex;gap:2rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.ts-v{font-family:var(--f1);font-size:1.2rem;font-weight:700;color:var(--o1)}
+.ts-l{font-size:.57rem;letter-spacing:1px;color:var(--t4);font-weight:600}
+.ver{color:var(--o1);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div id="sp-glow"></div>
+  <div class="sp-ring sr3"></div>
+  <div class="sp-ring sr2"></div>
+  <div class="sp-ring sr1"></div>
+  <div id="sp-logo">
+    <div id="sp-wm">BLACK INK</div>
+    <div id="sp-line"></div>
+    <div id="sp-sub">GALLERY</div>
+    <div id="sp-tag">NEXT-GENERATION SOCIAL · VIDEO · TECH ECOSYSTEM</div>
+  </div>
+  <div id="sp-prog">
+    <div id="sp-track"><div id="sp-fill"></div></div>
+    <div id="sp-status">INITIALIZING…</div>
+  </div>
+  <div id="sp-copy">© 2025 BLACK INK GALLERY — ALL RIGHTS RESERVED</div>
+  <div class="sp-corner sc-tl"></div><div class="sp-corner sc-tr"></div>
+  <div class="sp-corner sc-bl"></div><div class="sp-corner sc-br"></div>
+</div>
+
+<div id="root"></div>
+
+<script>
+// 3-second splash
+(function(){
+  var fill=document.getElementById('sp-fill'),
+      status=document.getElementById('sp-status'),
+      splash=document.getElementById('splash');
+  var steps=[
+    {p:10,l:'LOADING ASSETS…'},{p:28,l:'BUILDING DATABASE…'},
+    {p:46,l:'RENDERING UI…'},{p:64,l:'CONNECTING FEED…'},
+    {p:82,l:'SECURING PLATFORM…'},{p:100,l:'WELCOME TO BLACK INK'}
+  ];
+  var gap=(2700-400)/steps.length;
+  steps.forEach(function(s,i){
+    setTimeout(function(){fill.style.width=s.p+'%';status.textContent=s.l;},400+i*gap);
+  });
+  setTimeout(function(){splash.classList.add('out');setTimeout(function(){splash&&splash.parentNode&&splash.parentNode.removeChild(splash);},900);},3000);
+})();
+</script>
+
+<script type="text/babel">
+const{useState,useEffect,useCallback,useRef,createContext,useContext,useMemo}=React;
+
+// ── CONSTANTS ──────────────────────────────────────────────────────
+const ADMIN_PHONE="0986445528",ADMIN_PASS="Phillimon100++";
+const DB_KEY="big_titan_v5",SES_KEY="big_titan_ses",TH_KEY="big_titan_th";
+const CATS=["Tech/Code","Marketplace","Social","Video"];
+const REACTIONS=["👍","❤️","😂","😮","😢"];
+const RLABELS=["Like","Love","Haha","Wow","Sad"];
+const VKWS=["spam","scam","hate","violence","abuse","explicit","fraud","fake","illegal","drug","hack","malware","phishing"];
+const checkViol=t=>VKWS.find(k=>t.toLowerCase().includes(k))||null;
+const timeAgo=iso=>{const s=(Date.now()-new Date(iso))/1000;if(s<60)return"Just now";if(s<3600)return`${Math.floor(s/60)}m`;if(s<86400)return`${Math.floor(s/3600)}h`;return`${Math.floor(s/86400)}d`;};
+
+// ── SEED DATA ──────────────────────────────────────────────────────
+const USERS=[
+  {id:"u1",name:"Aria Nakamura",phone:"0991111111",password:"aria123",avatar:"AN",bio:"Digital artist & NFT creator. Tokyo → Nairobi.",role:"user",suspended:false,verified:true,followers:38400,following:291,joined:"Jan 2023"},
+  {id:"u2",name:"Kofi Mensah",phone:"0992222222",password:"kofi123",avatar:"KM",bio:"Luxury asset curator. I source what money can't Google.",role:"user",suspended:false,verified:true,followers:71200,following:88,joined:"Mar 2023"},
+  {id:"u3",name:"Zara Okafor",phone:"0993333333",password:"zara123",avatar:"ZO",bio:"Tech journalist covering AI, DeFi, and the African internet.",role:"user",suspended:false,verified:true,followers:124000,following:340,joined:"Feb 2023"},
+  {id:"u4",name:"Marcus Venn",phone:"0994444444",password:"marc123",avatar:"MV",bio:"Street photographer & visual storyteller. I chase light.",role:"user",suspended:false,verified:false,followers:56000,following:210,joined:"Apr 2023"},
+  {id:"u5",name:"Lena Blackwood",phone:"0995555555",password:"lena123",avatar:"LB",bio:"Blockchain architect building DeFi rails for Africa.",role:"user",suspended:false,verified:true,followers:93000,following:155,joined:"Jan 2023"},
+  {id:"u6",name:"Dante Reyes",phone:"0996666666",password:"dante123",avatar:"DR",bio:"VC & serial founder. 4 exits. Still hungry.",role:"user",suspended:false,verified:true,followers:220000,following:67,joined:"Dec 2022"},
+  {id:"u7",name:"Sable Winters",phone:"0997777777",password:"sable123",avatar:"SW",bio:"Creative director & luxury brand strategist.",role:"user",suspended:false,verified:true,followers:89000,following:420,joined:"Feb 2023"},
+];
+
+const TCONTENT=[
+  {content:"Just crossed 1M req/s on our Rust microservice. Zero GC pauses, deterministic latency. Node.js simply cannot compete at this throughput tier.",type:"text"},
+  {content:"GPT-5 fine-tuning: 50K domain samples gave us 34% accuracy lift over base model. The trick is curriculum learning — hardest examples last.",type:"text"},
+  {content:"ZK-SNARKs in one sentence: prove you know a secret without revealing it. We benchmarked Groth16 vs PLONK at scale. Results thread incoming.",type:"text"},
+  {content:"WebAssembly + Rust processing 4K images at 60fps in the browser. Zero server round trips. Client-side compute has truly arrived.",type:"text"},
+  {content:"Kubernetes HPA with custom metrics adapter cut our cloud bill by $18K/month. Predictive scaling beats reactive every single time.",type:"text"},
+  {content:"NeRF 3D reconstruction from phone photos using custom CUDA kernels. What used to need a $40K LiDAR rig now runs in 20 minutes.",type:"code",code:"// Neural Radiance Field — Volume Rendering\nconst renderRay = (origin, dir, near, far) => {\n  const N = 64; let color = vec3(0), T = 1.0;\n  for (let i = 0; i < N; i++) {\n    const t = near + (far-near)*(i/N);\n    const { sigma, rgb } = nerf.query(origin.add(dir.scale(t)), dir);\n    const alpha = 1 - Math.exp(-sigma*(far-near)/N);\n    color = color.add(rgb.scale(T*alpha));\n    T *= (1-alpha);\n    if (T < 1e-3) break;\n  }\n  return color;\n};"},
+  {content:"GraphQL federation across 12 microservices via Apollo Router. Replaced 3K lines of BFF glue. Schema composition cut first-render latency by 70%.",type:"text"},
+  {content:"Cloudflare Workers + Durable Objects: stateful serverless at sub-10ms global p99. Moved real-time sync off WebSockets entirely.",type:"text"},
+  {content:"Raft consensus from scratch in Go took 3 weeks. Paxos took 3 months to understand. That cognitive delta is enormous in production.",type:"text"},
+  {content:"TypeScript 5 conditional types with infer — the type system is Turing complete and I'm using it for API contract validation at compile time.",type:"code",code:"// Deep Readonly with TypeScript inference\ntype DeepReadonly<T> =\n  T extends (infer U)[]\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n    ? { readonly [K in keyof T]: DeepReadonly<T[K]> }\n    : T;\n\nconst config: DeepReadonly<AppConfig> = loadConfig();"},
+  {content:"SQLite in production: WAL + FTS5 + JSON functions. Under 100GB it beats managed Postgres on a single node. Stop over-engineering your stack.",type:"text"},
+  {content:"Custom arena allocator in C for audio DSP at 44100Hz. Eliminated every GC pause. The latency consistency made our engineer think the hardware changed.",type:"text"},
+  {content:"HTTP/3 in Zig crossed 10K GitHub stars. QUIC multiplexing definitively fixes the head-of-line blocking that made HTTP/2 a disappointment.",type:"text"},
+  {content:"LLM code review bot on CI catches architectural debt ESLint misses entirely. 50K PR training diffs. False positive rate: 2.3% after 3 months.",type:"text"},
+  {content:"pgvector inside Postgres: semantic search on 10M embeddings at sub-100ms. Killed three microservices and a Redis cluster doing it.",type:"text"},
+];
+const MCONTENT=[
+  {content:"Patek Philippe Nautilus 5726A — complete set, box and papers, 2023. Retail waitlist: 8 years. Moving it to fund the next acquisition.",type:"text"},
+  {content:"Rolls-Royce Cullinan Black Badge 2024. Hermès Havane leather, Starlight headliner, 2,200km from delivery. Offers above $500,000.",type:"text"},
+  {content:"Authenticated Basquiat sketch, circa 1983. Sotheby's provenance 2019. Gallery valuation $340K. Private sale only.",type:"text"},
+  {content:"Hermès Himalaya Birkin 25 — Nilo crocodile, palladium hardware, pristine with full documentation. $200,000 firm.",type:"text"},
+  {content:"Miami Beach penthouse: 8,400 sq ft, ocean views, rooftop infinity pool. Holly Hunt furnished. $18.5M. Serious inquiries only.",type:"text"},
+  {content:"Richard Mille RM 11-03 McLaren Edition. Titanium, micro-blasted, Geneva 2022. Full set. $185,000 firm.",type:"text"},
+  {content:"Private whisky cellar — 47 bottles. Macallan 1926 Fine & Rare valued at $1.2M. Must acquire as one complete collection.",type:"text"},
+  {content:"Lamborghini Sián FKP 37 — 1 of 63 worldwide, hybrid V12, 819hp. Delivered 2021, 400km total. $3.5M.",type:"text"},
+  {content:"Private island, Caribbean — 12 acres, freshwater spring, dock, airstrip-ready. $28M inclusive of reef rights.",type:"text"},
+  {content:"Bvlgari Octo Finissimo Tourbillon — world's thinnest at 1.95mm. Full titanium set, 2023. $95,000.",type:"text"},
+  {content:"Ferrari SF90 XX Stradale — 1 of 799, 1030hp hybrid, Rosso Corsa. 180km from Maranello. $900,000.",type:"text"},
+  {content:"Cartier Crash London 1967 — one of ~12 known. Recently from Cartier Conservation. Valuation $2.1M.",type:"text"},
+  {content:"Hong Kong Peak penthouse duplex — 6,200 sq ft, 270° harbour views, private lift. $22M.",type:"text"},
+  {content:"Audemars Piguet Royal Oak Concept Black Panther Flying Tourbillon — 1 of 250. Factory sealed. $180,000.",type:"text"},
+  {content:"Sunreef 80 Power 2023 — solar array, 3,000nm range, custom interior. Currently in Cannes. $6.2M.",type:"text"},
+];
+const SCONTENT=[
+  {content:"Wealth is assets generating income while you sleep. Richness is income that stops when you do. Build the former — always.",type:"text"},
+  {content:"Three years of silence. Dismissed, doubted, overlooked. One product launch changed everything. The obsession was always the foundation.",type:"text"},
+  {content:"Sunset at 35,000 feet over the Sahara. Some perspectives are only available to those who refuse to stay still.",type:"text"},
+  {content:"Naval's Almanack: more leverage per page than most MBA programmes. The section on specific knowledge alone is worth a year of tuition.",type:"text"},
+  {content:"Discipline is choosing the harder option automatically, without negotiation, every single time. Motivation is for beginners.",type:"text"},
+  {content:"Monaco in September. The city reminds you that proximity to concentrated ambition compounds as powerfully as any asset class.",type:"text"},
+  {content:"Every great company started as a conversation someone was afraid to have. The idea was never the constraint. Starting before certainty was.",type:"text"},
+  {content:"Morning protocol: 5AM, cold plunge, 90 minutes of deep work before any notification reaches the screen. One year of this is transformational.",type:"text"},
+  {content:"Japanese N2 certified. 18 months of immersion. Dutch starts January. Language is proof that systems defeat talent every single time.",type:"text"},
+  {content:"The algorithm rewards volume. Excellence rewards patience. The error is assuming they compete — they don't.",type:"text"},
+  {content:"Vienna private auction preview: old money taste meeting new technology creates the most asymmetric investment opportunities of my career.",type:"text"},
+  {content:"Every significant thing I've built required a complete collapse first. The rebuild was always superior because the constraints were finally understood.",type:"text"},
+  {content:"Stack this quarter: Thinking in Systems, Poor Charlie's Almanack, The Road to Character, The Lessons of History.",type:"text"},
+  {content:"Trust builds in years, collapses in seconds. This asymmetry should govern every single decision made under pressure.",type:"text"},
+  {content:"Compounding works on money, knowledge, relationships, and reputation equally. Most people only consciously apply it to one.",type:"text"},
+];
+const VCONTENT=[
+  {content:"WATCH: Rust vs Node.js — 1M req/s stress test, latency graphs, and the surprising winner in memory efficiency under load.",type:"video",videoLabel:"Tech Deep Dive · 18min"},
+  {content:"WATCH: Inside the Rolls-Royce Cullinan Black Badge factory in Goodwood. 800 hours of hand-assembly documented.",type:"video",videoLabel:"Luxury Tour · 24min"},
+  {content:"WATCH: Full walkthrough — Miami Beach penthouse at sunset. $18.5M of ocean-front architecture.",type:"video",videoLabel:"Property Tour · 12min"},
+  {content:"WATCH: Building a 10M-vector semantic search engine inside vanilla Postgres. Live demo and benchmark results.",type:"video",videoLabel:"Engineering Talk · 31min"},
+  {content:"WATCH: Monaco Grand Prix weekend — exclusive paddock access, yacht parties, and serious networking.",type:"video",videoLabel:"Lifestyle Vlog · 22min"},
+  {content:"WATCH: NFT market deep dive 2025 — which collections hold value and where serious collectors are positioning now.",type:"video",videoLabel:"Market Analysis · 27min"},
+  {content:"WATCH: Japanese N2 exam prep — full immersion method, Anki decks, and the output practice that made the difference.",type:"video",videoLabel:"Learning Series · 19min"},
+  {content:"WATCH: Building a DeFi protocol on Africa's fastest-growing blockchain — architecture, pitfalls, regulatory landscape.",type:"video",videoLabel:"Blockchain Build · 35min"},
+];
+
+const ALL=[
+  ...TCONTENT.map(t=>({...t,category:"Tech/Code"})),
+  ...MCONTENT.map(t=>({...t,category:"Marketplace"})),
+  ...SCONTENT.map(t=>({...t,category:"Social"})),
+  ...VCONTENT.map(t=>({...t,category:"Video"})),
+];
+
+const genPosts=()=>{
+  const posts=[];
+  for(let i=0;i<2100;i++){
+    const tpl=ALL[i%ALL.length];
+    const u=USERS[i%USERS.length];
+    posts.push({
+      id:`p${i}`,userId:u.id,userName:u.name,userAvatar:u.avatar,
+      content:tpl.content,type:tpl.type||"text",code:tpl.code||null,
+      videoLabel:tpl.videoLabel||null,category:tpl.category,
+      reactions:{},comments:[],shares:Math.floor(Math.random()*500),saves:0,
+      views:tpl.type==="video"?Math.floor(Math.random()*50000+500):0,
+      flagged:false,flagReason:null,
+      timestamp:new Date(Date.now()-Math.random()*90*86400000).toISOString(),
+    });
+  }
+  return posts;
+};
+
+const genNotifs=us=>[
+  {id:"n1",from:us[1].name,avatar:us[1].avatar,userId:us[1].id,text:"reacted ❤️ to your post",time:new Date(Date.now()-300000).toISOString(),read:false},
+  {id:"n2",from:us[2].name,avatar:us[2].avatar,userId:us[2].id,text:"commented on your post",time:new Date(Date.now()-900000).toISOString(),read:false},
+  {id:"n3",from:us[3].name,avatar:us[3].avatar,userId:us[3].id,text:"started following you",time:new Date(Date.now()-3600000).toISOString(),read:false},
+  {id:"n4",from:us[4].name,avatar:us[4].avatar,userId:us[4].id,text:"shared your post with 1.2K people",time:new Date(Date.now()-7200000).toISOString(),read:true},
+  {id:"n5",from:us[5].name,avatar:us[5].avatar,userId:us[5].id,text:"mentioned you in a comment",time:new Date(Date.now()-18000000).toISOString(),read:true},
+];
+
+const genStories=us=>us.map((u,i)=>({
+  id:`s${i}`,userId:u.id,name:u.name.split(" ")[0],avatar:u.avatar,
+  seen:false,color:["#FF8C00","#FF6B00","#FF4500","#FFB347","#FF7043","#FFA500","#FF8C00"][i%7],
+}));
+
+const EXTERNAL=[
+  {id:"e1",title:"The Future of Rust in Systems Programming",source:"TechCrunch",snippet:"How Mozilla's language is reshaping backend infrastructure.",category:"Tech/Code"},
+  {id:"e2",title:"Luxury Watch Market Report 2025",source:"Bloomberg",snippet:"Patek and AP maintain dominance as grey market premiums hit record highs.",category:"Marketplace"},
+  {id:"e3",title:"GraphQL Federation at Scale",source:"Medium",snippet:"Hard-won lessons from running federated graphs in production.",category:"Tech/Code"},
+];
+
+// ── DB ─────────────────────────────────────────────────────────────
+const loadDB=()=>{
+  try{const r=localStorage.getItem(DB_KEY);if(r){const p=JSON.parse(r);if(p.version===5)return p;}}catch{}
+  const users=USERS.map(u=>({...u}));
+  const db={version:5,users,posts:genPosts(),messages:[],notifications:genNotifs(users),stories:genStories(users)};
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  return db;
+};
+const saveDB=db=>{try{localStorage.setItem(DB_KEY,JSON.stringify(db));}catch{}};
+
+// ── CONTEXT ────────────────────────────────────────────────────────
+const Ctx=createContext(null);
+const useStore=()=>useContext(Ctx);
+
+function StoreProvider({children}){
+  const[db,setDB]=useState(null);
+  const[user,setUser]=useState(null);
+  const[page,setPage]=useState("feed");
+  const[timeline,setTimeline]=useState(null);
+  const[theme,setThemeState]=useState("dark");
+  const[suspended,setSus]=useState(false);
+  const[notifOpen,setNotifOpen]=useState(false);
+  const[settingsOpen,setSettingsOpen]=useState(false);
+  const[searchQ,setSearchQ]=useState("");
+  const[reactionPicker,setReactionPicker]=useState(null);
+
+  useEffect(()=>{
+    const loaded=loadDB();
+    setDB(loaded);
+    const t=localStorage.getItem(TH_KEY)||"dark";
+    setThemeState(t);
+    document.documentElement.setAttribute("data-theme",t);
+    try{
+      const raw=localStorage.getItem(SES_KEY);
+      if(!raw)return;
+      const saved=JSON.parse(raw);
+      if(saved.role==="admin"){setUser(saved);setPage("admin");return;}
+      const fresh=loaded.users.find(u=>u.id===saved.id);
+      if(!fresh)return;
+      if(fresh.suspended){setSus(true);return;}
+      setUser(fresh);
+    }catch{}
+  },[]);
+
+  const updateDB=useCallback(newDB=>{
+    setDB({...newDB});saveDB(newDB);
+    if(user&&user.role!=="admin"){
+      const f=newDB.users.find(u=>u.id===user.id);
+      if(f?.suspended){setSus(true);localStorage.removeItem(SES_KEY);}
+    }
+  },[user]);
+
+  const setTheme=useCallback(t=>{
+    setThemeState(t);
+    localStorage.setItem(TH_KEY,t);
+    document.documentElement.setAttribute("data-theme",t);
+  },[]);
+
+  const login=useCallback(u=>{
+    if(u.suspended){setSus(true);return;}
+    localStorage.setItem(SES_KEY,JSON.stringify(u));
+    setUser(u);setPage(u.role==="admin"?"admin":"feed");
+  },[]);
+
+  const logout=useCallback(()=>{
+    localStorage.removeItem(SES_KEY);
+    setUser(null);setSus(false);setPage("feed");setSettingsOpen(false);setNotifOpen(false);
+  },[]);
+
+  const reactToPost=useCallback((pid,emoji)=>{
+    if(!db||!user)return;
+    const post=db.posts.find(p=>p.id===pid);
+    if(!post)return;
+    if(!post.reactions)post.reactions={};
+    REACTIONS.forEach(e=>{if(post.reactions[e])post.reactions[e]=post.reactions[e].filter(id=>id!==user.id);});
+    if(!post.reactions[emoji])post.reactions[emoji]=[];
+    const alreadyRemoved=!Object.values(post.reactions).flat().includes(user.id);
+    if(alreadyRemoved)post.reactions[emoji].push(user.id);
+    setReactionPicker(null);updateDB({...db});
+  },[db,user,updateDB]);
+
+  const getTR=useCallback(post=>Object.values(post.reactions||{}).reduce((a,arr)=>a+arr.length,0),[]);
+  const getUserR=useCallback(post=>{if(!post.reactions||!user)return null;for(const[e,us]of Object.entries(post.reactions)){if(us.includes(user.id))return e;}return null;},[user]);
+
+  const addComment=useCallback((pid,text,parentId=null)=>{
+    if(!db||!user||!text.trim())return;
+    const post=db.posts.find(p=>p.id===pid);if(!post)return;
+    const c={id:`c${Date.now()}`,userId:user.id,userName:user.name,userAvatar:user.avatar,text:text.trim(),timestamp:new Date().toISOString(),replies:[]};
+    if(parentId){const par=post.comments.find(x=>x.id===parentId);if(par){if(!par.replies)par.replies=[];par.replies.push(c);}}
+    else post.comments.push(c);
+    updateDB({...db});
+  },[db,user,updateDB]);
+
+  const deleteComment=useCallback((pid,cid)=>{
+    if(!db||!user)return;
+    const post=db.posts.find(p=>p.id===pid);if(!post)return;
+    post.comments=post.comments.filter(c=>c.id!==cid);
+    post.comments.forEach(c=>{if(c.replies)c.replies=c.replies.filter(r=>r.id!==cid);});
+    updateDB({...db});
+  },[db,user,updateDB]);
+
+  const publishPost=useCallback((content,category)=>{
+    if(!db||!user||!content.trim())return null;
+    const viol=checkViol(content);
+    db.posts.unshift({id:`p${Date.now()}`,userId:user.id,userName:user.name,userAvatar:user.avatar,
+      content:content.trim(),type:"text",code:null,videoLabel:null,category,
+      reactions:{},comments:[],shares:0,saves:0,views:0,
+      flagged:!!viol,flagReason:viol||null,timestamp:new Date().toISOString()});
+    updateDB({...db});
+    return{flagged:!!viol};
+  },[db,user,updateDB]);
+
+  const sharePost=useCallback(pid=>{
+    if(!db)return;
+    const p=db.posts.find(x=>x.id===pid);
+    if(p){p.shares=(p.shares||0)+1;updateDB({...db});}
+  },[db,updateDB]);
+
+  const sendMessage=useCallback((toId,text)=>{
+    if(!db||!user||!text.trim())return;
+    if(!db.messages)db.messages=[];
+    db.messages.push({id:`m${Date.now()}`,from:user.id,to:toId,text:text.trim(),timestamp:new Date().toISOString()});
+    updateDB({...db});
+  },[db,user,updateDB]);
+
+  const getConvo=useCallback(otherId=>(db?.messages||[]).filter(m=>(m.from===user?.id&&m.to===otherId)||(m.from===otherId&&m.to===user?.id)),[db,user]);
+
+  const markAllRead=useCallback(()=>{if(!db)return;db.notifications.forEach(n=>n.read=true);updateDB({...db});},[db,updateDB]);
+  const unreadCount=useMemo(()=>db?.notifications?.filter(n=>!n.read).length||0,[db]);
+
+  const markStorySeen=useCallback(sid=>{
+    if(!db)return;const s=db.stories?.find(x=>x.id===sid);
+    if(s){s.seen=true;updateDB({...db});}
+  },[db,updateDB]);
+
+  const banUser=useCallback(uid=>{
+    if(!db)return;const u=db.users.find(x=>x.id===uid);if(!u||u.suspended)return;
+    u.suspended=true;
+    try{const s=localStorage.getItem(SES_KEY);if(s&&JSON.parse(s).id===uid)localStorage.removeItem(SES_KEY);}catch{}
+    updateDB({...db});
+  },[db,updateDB]);
+
+  const reinstateUser=useCallback(uid=>{
+    if(!db)return;const u=db.users.find(x=>x.id===uid);if(u){u.suspended=false;updateDB({...db});}
+  },[db,updateDB]);
+
+  const removePost=useCallback(pid=>{
+    if(!db)return;const i=db.posts.findIndex(p=>p.id===pid);
+    if(i>-1){db.posts.splice(i,1);updateDB({...db});}
+  },[db,updateDB]);
+
+  const{localResults,externalResults}=useMemo(()=>{
+    if(searchQ.length<2)return{localResults:[],externalResults:[]};
+    const q=searchQ.toLowerCase();
+    const lr=(db?.posts||[]).filter(p=>p.content.toLowerCase().includes(q)||p.userName.toLowerCase().includes(q)).slice(0,8);
+    const ur=(db?.users||[]).filter(u=>u.name.toLowerCase().includes(q)).slice(0,3).map(u=>({...u,_isUser:true}));
+    const er=lr.length===0?EXTERNAL.filter(r=>r.title.toLowerCase().includes(q)||r.snippet.toLowerCase().includes(q)):[];
+    return{localResults:[...lr,...ur],externalResults:er};
+  },[searchQ,db]);
+
+  return(
+    <Ctx.Provider value={{
+      db,user,page,setPage,theme,setTheme,suspended,setSus,
+      timeline,setTimeline,login,logout,updateDB,
+      reactToPost,getTR,getUserR,reactionPicker,setReactionPicker,
+      addComment,deleteComment,publishPost,sharePost,
+      sendMessage,getConvo,
+      markAllRead,unreadCount,markStorySeen,
+      banUser,reinstateUser,removePost,
+      notifOpen,setNotifOpen,settingsOpen,setSettingsOpen,
+      searchQ,setSearchQ,localResults,externalResults,
+    }}>
+      {children}
+    </Ctx.Provider>
+  );
+}
+
+// ── AVATAR ─────────────────────────────────────────────────────────
+const APAL=[
+  ["#FF8C00","#1a0c00"],["#FF6B00","#1a0800"],["#FFB347","#1a1000"],
+  ["#FF4500","#1a0400"],["#FFA500","#1a0e00"],["#FF7043","#1a0600"],["#FF8C00","#1a0c00"]
+];
+function Avi({initials="?",size=36,uid="",onClick}){
+  const idx=uid?uid.charCodeAt(uid.length-1)%7:0;
+  const[fg,bg]=APAL[idx];
+  return(
+    <div onClick={onClick} style={{
+      width:size,height:size,borderRadius:"50%",
+      background:`radial-gradient(circle at 35% 35%,${bg},#020202)`,
+      border:`1px solid ${fg}22`,color:fg,display:"flex",alignItems:"center",
+      justifyContent:"center",fontSize:size*.3,fontWeight:700,flexShrink:0,
+      userSelect:"none",letterSpacing:.5,cursor:onClick?"pointer":"default",
+    }}>{initials}</div>
+  );
+}
+
+// ── SUSPENDED SCREEN ───────────────────────────────────────────────
+function SuspendedScreen(){
+  return(
+    <div className="sus-wrap">
+      <div className="sus-card">
+        <div className="sus-icon">🔒</div>
+        <h1 className="sus-title">ACCOUNT SUSPENDED</h1>
+        <p className="sus-text">Your account has been suspended for violating Black Ink Gallery community standards. Contact the Chief Administrator if you believe this is an error.</p>
+        <a href="https://wa.me/+265986445528" target="_blank" rel="noreferrer" className="btn btn-g" style={{display:"inline-flex"}}>📲 Contact Chief Admin</a>
+      </div>
+    </div>
+  );
+}
+
+// ── AUTH ────────────────────────────────────────────────────────────
+function AuthScreen(){
+  const{db,login}=useStore();
+  const[mode,setMode]=useState("login");
+  const[phone,setPhone]=useState("");
+  const[pass,setPass]=useState("");
+  const[name,setName]=useState("");
+  const[err,setErr]=useState("");
+
+  const doLogin=()=>{
+    setErr("");
+    if(phone===ADMIN_PHONE&&pass===ADMIN_PASS){
+      login({id:"admin",name:"Chief Admin",phone:ADMIN_PHONE,role:"admin",avatar:"CA",suspended:false,verified:true,followers:0,following:0,bio:"Chief Administrator of Black Ink Gallery."});
+      return;
+    }
+    const u=db?.users?.find(x=>x.phone===phone&&x.password===pass);
+    if(!u){setErr("Incorrect credentials. Please check your details.");return;}
+    login(u);
+  };
+
+  const doReg=()=>{
+    setErr("");
+    if(!name.trim()||!phone.trim()||!pass.trim()){setErr("All fields are required.");return;}
+    if(db?.users?.find(x=>x.phone===phone)){setErr("Phone number already registered.");return;}
+    const nu={id:`u${Date.now()}`,name:name.trim(),phone,password:pass,
+      avatar:name.trim().split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2),
+      bio:"Black Ink Gallery member.",role:"user",suspended:false,
+      verified:false,followers:0,following:0,joined:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"})};
+    if(db)db.users.push(nu);
+    login(nu);
+  };
+
+  return(
+    <div className="auth-wrap">
+      <div className="auth-orb"/>
+      <div className="auth-card">
+        <div style={{textAlign:"center",marginBottom:"2rem"}}>
+          <div className="auth-wm">BLACK INK</div>
+          <div className="auth-sub">GALLERY</div>
+          <div className="auth-rule"/>
+        </div>
+        <div className="auth-lbl">{mode==="login"?"MEMBER ACCESS":"CREATE MEMBERSHIP"}</div>
+        {mode==="register"&&<input className="field" placeholder="Full Name" value={name} onChange={e=>setName(e.target.value)}/>}
+        <input className="field" placeholder="Phone Number" value={phone} onChange={e=>setPhone(e.target.value)}/>
+        <input className="field" type="password" placeholder="Password" value={pass} style={{marginBottom:0}}
+          onChange={e=>setPass(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&(mode==="login"?doLogin():doReg())}/>
+        {err&&<div className="auth-err" style={{marginTop:".75rem"}}>{err}</div>}
+        <div style={{display:"flex",flexDirection:"column",gap:".6rem",marginTop:"1.25rem"}}>
+          <button className="btn btn-p btn-fw" onClick={mode==="login"?doLogin:doReg}>
+            {mode==="login"?"ENTER THE GALLERY":"JOIN BLACK INK"}
+          </button>
+          <button className="btn btn-g btn-fw" onClick={()=>{setMode(mode==="login"?"register":"login");setErr("");}}>
+            {mode==="login"?"New Member? Register":"Already a member? Login"}
+          </button>
+        </div>
+        <div style={{textAlign:"center",marginTop:"2rem",fontSize:".54rem",color:"var(--t4)",letterSpacing:2}}>© 2025 BLACK INK GALLERY</div>
+      </div>
+    </div>
+  );
+}
+
+// ── SEARCH DROPDOWN ─────────────────────────────────────────────────
+function SearchDD(){
+  const{localResults,externalResults,setSearchQ,setPage,setTimeline}=useStore();
+  if(!localResults.length&&!externalResults.length)return null;
+  return(
+    <div className="search-dd">
+      {localResults.length>0&&<>
+        <div className="sdlbl">IN BLACK INK</div>
+        {localResults.map(r=>(
+          <div key={r.id||r.userId} className="sditem" onClick={()=>{
+            if(r._isUser){setTimeline(r.id);setPage("timeline");}
+            setSearchQ("");
+          }}>
+            <div className="sdauthor">{r._isUser?"👤 "+r.name:r.userName+" · "+r.category}</div>
+            <div className="sdtext">{(r.bio||r.content||"").slice(0,80)}…</div>
+          </div>
+        ))}
+      </>}
+      {externalResults.length>0&&<>
+        <div className="sdlbl">WEB RESULTS<span className="ext-badge">API</span></div>
+        {externalResults.map(r=>(
+          <div key={r.id} className="sditem">
+            <div className="sdauthor">🌐 {r.title}</div>
+            <div className="sdtext">{r.snippet}</div>
+            <div style={{fontSize:".63rem",color:"var(--t4)",marginTop:".1rem"}}>{r.source}</div>
+          </div>
+        ))}
+      </>}
+    </div>
+  );
+}
+
+// ── NOTIF PANEL ─────────────────────────────────────────────────────
+function NotifPanel(){
+  const{db,notifOpen,setNotifOpen,markAllRead,setPage,setTimeline}=useStore();
+  if(!notifOpen)return null;
+  return(
+    <>
+      <div style={{position:"fixed",inset:0,zIndex:349}} onClick={()=>setNotifOpen(false)}/>
+      <div className="npanel">
+        <div className="nhdr">
+          <span className="ntitle">NOTIFICATIONS</span>
+          <button className="btn btn-g btn-sm" onClick={markAllRead}>Mark all read</button>
+        </div>
+        {db?.notifications?.map(n=>(
+          <div key={n.id} className={`nitem${n.read?"":" unread"}`} onClick={()=>{if(n.userId){setTimeline(n.userId);setPage("timeline");}setNotifOpen(false);}}>
+            {!n.read&&<div className="ndot"/>}
+            <Avi initials={n.avatar} size={32} uid={n.from}/>
+            <div>
+              <div className="ntext"><span className="nfrom">{n.from}</span> {n.text}</div>
+              <div className="ntime">{timeAgo(n.time)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ── NAVBAR ──────────────────────────────────────────────────────────
+function Navbar({onSettings}){
+  const{user,page,setPage,unreadCount,notifOpen,setNotifOpen,searchQ,setSearchQ}=useStore();
+  const tabs=user.role==="admin"
+    ?[["admin","⚡ Admin"],["feed","Feed"],["watch","Watch"],["market","Market"],["messages","Inbox"]]
+    :[["feed","Feed"],["watch","Watch"],["gallery","Gallery"],["market","Market"],["messages","Inbox"]];
+  return(
+    <nav className="navbar">
+      <div className="nb-inner">
+        <div className="nb-brand" onClick={()=>setPage("feed")}>
+          <span className="nb-wm">BLACK INK</span>
+          <span className="nb-gl">GALLERY</span>
+        </div>
+        <div className="nb-search">
+          <span className="nb-si">🔍</span>
+          <input className="nb-inp" placeholder="Search posts, users, code…" value={searchQ} onChange={e=>setSearchQ(e.target.value)}/>
+          {searchQ.length>=2&&<SearchDD/>}
+        </div>
+        <div className="nb-tabs">
+          {tabs.map(([id,lbl])=>(
+            <button key={id} className={`tab${page===id?" on":""}`} onClick={()=>setPage(id)}>{lbl}</button>
+          ))}
+        </div>
+        <div className="nb-right">
+          {user.role==="admin"&&<span className="admin-chip">ADMIN</span>}
+          <div className="nb-notif">
+            <button className="icon-btn" onClick={()=>setNotifOpen(!notifOpen)}>🔔</button>
+            {unreadCount>0&&<div className="nb-badge">{unreadCount>9?"9+":unreadCount}</div>}
+          </div>
+          <Avi initials={user.avatar} size={30} uid={user.id}/>
+          <button className="icon-btn" onClick={onSettings}>⚙️</button>
+        </div>
+      </div>
+      <NotifPanel/>
+    </nav>
+  );
+}
+
+// ── SETTINGS ────────────────────────────────────────────────────────
+function Settings({onClose}){
+  const{user,theme,setTheme,logout}=useStore();
+  return(
+    <div className="sp-overlay" onClick={onClose}>
+      <div className="sp-panel" onClick={e=>e.stopPropagation()}>
+        <div className="sp-hd">
+          <span className="sp-title">SETTINGS</span>
+          <button className="icon-btn" onClick={onClose}>✕</button>
+        </div>
+        <div className="sp-sec">
+          <div className="sp-lbl">DISPLAY</div>
+          {[["dark","Dark Mode"],["light","Light Mode"],["pitch","Pitch Black"]].map(([t,lbl])=>(
+            <div key={t} className="sp-row">
+              <span className="sp-rl">{lbl}</span>
+              <button className={`toggle${theme===t?" on":""}`} onClick={()=>setTheme(t)}><div className="tknob"/></button>
+            </div>
+          ))}
+        </div>
+        <div className="sp-sec">
+          <div className="sp-lbl">PRIVACY</div>
+          {[["Profile Visibility","Public"],["Messages","Everyone"],["Activity","Visible"]].map(([k,v])=>(
+            <div key={k} className="sp-row"><span className="sp-rl">{k}</span><span className="sp-rv">{v}</span></div>
+          ))}
+        </div>
+        <div className="sp-sec">
+          <div className="sp-lbl">COMMUNITY RULES</div>
+          <div className="sp-info">Black Ink Gallery maintains a premium, professional environment. No hate speech, explicit content, spam, fraud, or illegal content. Violations result in permanent suspension without appeal.</div>
+        </div>
+        <div className="sp-sec">
+          <div className="sp-lbl">DIRECT ADMIN PORTAL</div>
+          <p style={{color:"var(--t3)",fontSize:".78rem",marginBottom:".85rem",lineHeight:1.65}}>Chat directly with the Chief Administrator for urgent matters.</p>
+          <a href="https://wa.me/+265986445528" target="_blank" rel="noreferrer" className="btn btn-p btn-fw" style={{justifyContent:"center",letterSpacing:1.5}}>📲 Message Chief Admin on WhatsApp</a>
+        </div>
+        <div className="sp-sec">
+          <div className="sp-lbl">ACCOUNT</div>
+          <div style={{color:"var(--t3)",fontSize:".78rem",marginBottom:".75rem"}}>Signed in as <span style={{color:"var(--o1)",fontWeight:700}}>{user.name}</span></div>
+          <button className="btn btn-d btn-fw" style={{padding:".75rem",letterSpacing:1.5}} onClick={logout}>LOGOUT</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── CODE BLOCK ──────────────────────────────────────────────────────
+function CodeBlock({code}){
+  const[copied,setCopied]=useState(false);
+  const copy=()=>{navigator.clipboard?.writeText(code).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
+  return(
+    <div className="code-wrap">
+      <div className="code-hdr">
+        <div className="code-dots">
+          <div className="cd" style={{background:"#ff5f56"}}/>
+          <div className="cd" style={{background:"#ffbd2e"}}/>
+          <div className="cd" style={{background:"#27c93f"}}/>
+        </div>
+        <span className="code-lang">CODE SNIPPET</span>
+        <button className="btn btn-g btn-sm" onClick={copy}>{copied?"✓ Copied":"Copy"}</button>
+      </div>
+      <pre className="code-body">{code}</pre>
+    </div>
+  );
+}
+
+// ── COMMENT ITEM ────────────────────────────────────────────────────
+function CItem({comment,postId,depth=0}){
+  const{user,addComment,deleteComment}=useStore();
+  const[open,setOpen]=useState(false);
+  const[txt,setTxt]=useState("");
+  const doReply=()=>{if(!txt.trim())return;addComment(postId,txt,comment.id);setTxt("");setOpen(false);};
+  return(
+    <div className="citem" style={{marginLeft:depth>0?"1.5rem":0}}>
+      <Avi initials={comment.userAvatar||comment.userName.slice(0,2).toUpperCase()} size={26} uid={comment.userId||""}/>
+      <div style={{flex:1}}>
+        <div className="cbubble">
+          <div className="cauthor">{comment.userName}</div>
+          <div className="ctext">{comment.text}</div>
+        </div>
+        <div className="cfoot">
+          <span className="ctime">{timeAgo(comment.timestamp)}</span>
+          {depth<2&&<button className="rbtn" onClick={()=>setOpen(!open)}>↩ Reply</button>}
+          {comment.userId===user?.id&&<button className="delbtn" onClick={()=>deleteComment(postId,comment.id)}>🗑</button>}
+        </div>
+        {open&&(
+          <div className="cinput-row" style={{marginTop:".35rem"}}>
+            <input autoFocus className="cinput" value={txt} onChange={e=>setTxt(e.target.value)} onKeyDown={e=>e.key==="Enter"&&doReply()} placeholder={`Reply to ${comment.userName}…`}/>
+            <button className="btn btn-p btn-sm" onClick={doReply}>Reply</button>
+          </div>
+        )}
+        {comment.replies?.map(r=><CItem key={r.id} comment={r} postId={postId} depth={depth+1}/>)}
+      </div>
+    </div>
+  );
+}
+
+// ── POST CARD ───────────────────────────────────────────────────────
+function Post({post,adminMode=false}){
+  const{user,reactToPost,getTR,getUserR,sharePost,addComment,setReactionPicker,reactionPicker,banUser,removePost,setPage,setTimeline}=useStore();
+  const[showC,setShowC]=useState(false);
+  const[cTxt,setCTxt]=useState("");
+  const[shared,setShared]=useState(false);
+  const myR=getUserR(post);
+  const totalR=getTR(post);
+  const catCls={
+    "Tech/Code":"tc","Marketplace":"mc","Social":"sc","Video":"vc"
+  }[post.category]||"sc";
+
+  const handleShare=()=>{sharePost(post.id);setShared(true);setTimeout(()=>setShared(false),2000);};
+  const handleC=()=>{if(!cTxt.trim())return;addComment(post.id,cTxt);setCTxt("");};
+
+  const rSummary=Object.entries(post.reactions||{}).filter(([,a])=>a.length>0).map(([e,a])=>({e,c:a.length}));
+
+  return(
+    <article className={`post${post.flagged?" flagged":""}`}>
+      <div className="ph">
+        <div className="pu" onClick={()=>{setTimeline(post.userId);setPage("timeline");}}>
+          <Avi initials={post.userAvatar} size={38} uid={post.userId}/>
+          <div>
+            <div className="pname">{post.userName}</div>
+            <div className="pmeta">{timeAgo(post.timestamp)}</div>
+          </div>
+        </div>
+        <div className="pbadges">
+          {post.flagged&&<span className="ftag">FLAGGED</span>}
+          <span className={`ctag ${catCls}`}>{post.category}</span>
+          {adminMode&&<button className="lbtn" title={`Suspend ${post.userName}`} onClick={()=>{if(window.confirm(`Suspend ${post.userName}?`))banUser(post.userId);}}>🔒</button>}
+        </div>
+      </div>
+      <div className="pbody">{post.content}</div>
+      {post.code&&<CodeBlock code={post.code}/>}
+      {post.type==="video"&&(
+        <div style={{background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:10,margin:".75rem 0",overflow:"hidden"}}>
+          <div style={{height:180,background:"linear-gradient(135deg,#1a0c00,#050505)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:".75rem",cursor:"pointer"}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:"var(--og1)",border:"2px solid var(--o1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.3rem"}}>▶</div>
+            <span style={{fontSize:".68rem",letterSpacing:1.5,color:"var(--o3)",fontWeight:600}}>{post.videoLabel||"VIDEO"}</span>
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",padding:".5rem .85rem",borderTop:"1px solid var(--border)"}}>
+            <span style={{fontSize:".68rem",color:"var(--t3)"}}>👁 {post.views?.toLocaleString()||0} views</span>
+            <span style={{fontSize:".68rem",color:"var(--t3)"}}>{post.videoLabel}</span>
+          </div>
+        </div>
+      )}
+      {rSummary.length>0&&(
+        <div className="rsummary">
+          <div>{rSummary.slice(0,4).map(r=><span key={r.e} style={{fontSize:".8rem"}}>{r.e}</span>)}</div>
+          <span style={{fontSize:".72rem",color:"var(--t3)"}}>{totalR} reaction{totalR!==1?"s":""}</span>
+        </div>
+      )}
+      <div className="pactions">
+        {reactionPicker===post.id&&(
+          <>
+            <div style={{position:"fixed",inset:0,zIndex:89}} onClick={()=>setReactionPicker(null)}/>
+            <div className="rpicker">
+              {REACTIONS.map((em,i)=>(
+                <button key={em} className="ropt" title={RLABELS[i]} onClick={()=>reactToPost(post.id,em)}>{em}</button>
+              ))}
+            </div>
+          </>
+        )}
+        <button className={`abtn${myR?" reacted":""}`} onClick={()=>setReactionPicker(reactionPicker===post.id?null:post.id)}>
+          <span className="aem">{myR||"👍"}</span>
+          <span className="albl">{myR?"Reacted":"React"}</span>
+          <span className="acnt">{totalR||""}</span>
+        </button>
+        <button className="abtn" onClick={()=>setShowC(!showC)}>
+          <span className="aem">💬</span>
+          <span className="albl">Critique</span>
+          <span className="acnt">{post.comments?.length||0}</span>
+        </button>
+        <button className={`abtn${shared?" shared":""}`} onClick={handleShare}>
+          <span className="aem">{shared?"✅":"↗"}</span>
+          <span className="albl">{shared?"Spread!":"Spread"}</span>
+          <span className="acnt">{post.shares||0}</span>
+        </button>
+        {adminMode&&(
+          <button className="abtn" style={{color:"var(--red)"}} onClick={()=>{if(window.confirm("Remove post?"))removePost(post.id);}}>
+            <span>🗑</span><span className="albl">Remove</span>
+          </button>
+        )}
+      </div>
+      {showC&&(
+        <div className="carea">
+          {post.comments?.map(c=><CItem key={c.id} comment={c} postId={post.id}/>)}
+          <div className="cinput-row">
+            <Avi initials={user.avatar} size={26} uid={user.id}/>
+            <input className="cinput" value={cTxt} onChange={e=>setCTxt(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleC()} placeholder="Write a critique…"/>
+            <button className="btn btn-p btn-sm" onClick={handleC}>Post</button>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+}
+
+// ── STORIES ─────────────────────────────────────────────────────────
+function StoriesBar(){
+  const{db,markStorySeen,setPage,setTimeline}=useStore();
+  if(!db?.stories)return null;
+  return(
+    <div className="stories">
+      <div className="story">
+        <div style={{width:58,height:58,borderRadius:"50%",background:"var(--og2)",border:"1px dashed var(--border-o)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--o1)",fontSize:"1.4rem",cursor:"pointer"}}>＋</div>
+        <span className="story-name">Add Story</span>
+      </div>
+      {db.stories.map(s=>(
+        <div key={s.id} className="story" onClick={()=>{markStorySeen(s.id);setTimeline(s.userId);setPage("timeline");}}>
+          <div className={`story-ring${s.seen?" seen":""}`} style={{background:s.seen?undefined:`linear-gradient(135deg,${s.color},#FF4500)`}}>
+            <div className="story-inner">
+              <Avi initials={s.avatar} size={50} uid={s.userId}/>
+            </div>
+          </div>
+          <span className="story-name">{s.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── COMPOSER ────────────────────────────────────────────────────────
+function Composer(){
+  const{user,publishPost}=useStore();
+  const[content,setContent]=useState("");
+  const[cat,setCat]=useState("Social");
+  const[fb,setFb]=useState(null);
+  const submit=()=>{
+    if(!content.trim()||content.length>2000)return;
+    const r=publishPost(content,cat);
+    setContent("");
+    setFb(r?.flagged?{msg:"Published — flagged for review.",cls:"warn"}:{msg:"Published successfully ✓",cls:"ok"});
+    setTimeout(()=>setFb(null),3500);
+  };
+  return(
+    <div className="composer">
+      <div style={{display:"flex",gap:".65rem",alignItems:"flex-start"}}>
+        <Avi initials={user.avatar} size={38} uid={user.id}/>
+        <textarea className="comp-ta" value={content} onChange={e=>setContent(e.target.value)}
+          placeholder="Share something with the Black Ink community…"
+          onFocus={e=>e.target.style.borderColor="var(--border-o)"}
+          onBlur={e=>e.target.style.borderColor="var(--border)"}/>
+      </div>
+      <div className="comp-row">
+        <div style={{display:"flex",gap:".35rem"}}>
+          {CATS.map(c=><button key={c} className={`cat-chip${cat===c?" on":""}`} onClick={()=>setCat(c)}>{c}</button>)}
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
+          {fb&&<span className={`fb ${fb.cls}`}>{fb.msg}</span>}
+          <span className={`char-c${content.length>1800?" warn":""}`}>{content.length}/2000</span>
+          <button className="btn btn-p btn-sm" onClick={submit} disabled={!content.trim()||content.length>2000} style={{opacity:!content.trim()?.45:1}}>PUBLISH</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PROFILE WIDGET ───────────────────────────────────────────────────
+function ProfileWidget(){
+  const{user,db}=useStore();
+  const posts=db?.posts?.filter(p=>p.userId===user.id)||[];
+  const tr=posts.reduce((a,p)=>a+Object.values(p.reactions||{}).flat().length,0);
+  return(
+    <div className="scard" style={{padding:0,overflow:"hidden"}}>
+      <div className="pw-banner"/>
+      <div className="pw-body">
+        <div className="pw-avi"><Avi initials={user.avatar} size={48} uid={user.id}/></div>
+        <div style={{display:"flex",alignItems:"center",gap:".4rem"}}>
+          <div className="pw-name">{user.name}</div>
+          {user.verified&&<span className="ver">✓</span>}
+        </div>
+        <div className="pw-bio">{user.bio||"Black Ink Gallery member."}</div>
+        <div className="pw-stats">
+          <div><div className="ps-v">{posts.length}</div><div className="ps-l">POSTS</div></div>
+          <div><div className="ps-v">{tr}</div><div className="ps-l">REACTIONS</div></div>
+          <div><div className="ps-v">{(user.followers||0).toLocaleString()}</div><div className="ps-l">FOLLOWERS</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── TRENDING WIDGET ──────────────────────────────────────────────────
+function TrendingWidget(){
+  const{db}=useStore();
+  const top=[...(db?.posts||[])].sort((a,b)=>Object.values(b.reactions||{}).flat().length-Object.values(a.reactions||{}).flat().length).slice(0,5);
+  return(
+    <div className="scard">
+      <div className="slbl">TRENDING NOW</div>
+      {top.map((p,i)=>(
+        <div key={p.id} className="trend-item">
+          <span className="trank">#{i+1}</span>
+          <div><div className="ttext">{p.content.slice(0,72)}…</div><div className="tmeta">{Object.values(p.reactions||{}).flat().length} reactions · {p.category}</div></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── MEMBERS WIDGET ───────────────────────────────────────────────────
+function MembersWidget(){
+  const{db,setPage,setTimeline}=useStore();
+  return(
+    <div className="scard">
+      <div className="slbl">PEOPLE TO FOLLOW</div>
+      {db?.users?.slice(0,5).map(u=>(
+        <div key={u.id} style={{display:"flex",gap:".5rem",alignItems:"center",padding:".45rem 0",borderBottom:"1px solid var(--border2)"}}>
+          <Avi initials={u.avatar} size={30} uid={u.id} onClick={()=>{setTimeline(u.id);setPage("timeline");}}/>
+          <div style={{flex:1}}>
+            <div style={{color:"var(--t1)",fontSize:".82rem",fontWeight:600,cursor:"pointer"}} onClick={()=>{setTimeline(u.id);setPage("timeline");}}>
+              {u.name}{u.verified&&<span style={{color:"var(--o1)",marginLeft:3}}>✓</span>}
+            </div>
+            <div style={{color:"var(--t4)",fontSize:".65rem"}}>{u.followers?.toLocaleString()} followers</div>
+          </div>
+          <button className="btn btn-g btn-sm" style={{padding:".22rem .6rem",fontSize:".63rem"}}>Follow</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── LEFT SIDEBAR ────────────────────────────────────────────────────
+function SidebarLeft(){
+  const{page,setPage,user}=useStore();
+  const items=[
+    {id:"feed",icon:"🏠",lbl:"Home Feed"},
+    {id:"watch",icon:"📹",lbl:"Watch"},
+    {id:"gallery",icon:"🖼️",lbl:"Gallery"},
+    {id:"market",icon:"💎",lbl:"Marketplace"},
+    {id:"messages",icon:"💬",lbl:"Messages"},
+    ...(user.role==="admin"?[{id:"admin",icon:"⚡",lbl:"Admin Panel"}]:[]),
+  ];
+  return(
+    <aside className="sidebar sl">
+      <ProfileWidget/>
+      <div className="scard">
+        <div className="slbl">NAVIGATE</div>
+        {items.map(item=>(
+          <button key={item.id} className={`nav-item${page===item.id?" on":""}`} onClick={()=>setPage(item.id)}>
+            <span style={{fontSize:".9rem",width:20,textAlign:"center",flexShrink:0}}>{item.icon}</span>{item.lbl}
+          </button>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+// ── RIGHT SIDEBAR ────────────────────────────────────────────────────
+function SidebarRight(){
+  return(
+    <aside className="sidebar sr">
+      <TrendingWidget/><MembersWidget/>
+    </aside>
+  );
+}
+
+// ── FEED PAGE ────────────────────────────────────────────────────────
+function FeedPage(){
+  const{db}=useStore();
+  const[filter,setFilter]=useState("All");
+  const[pg,setPg]=useState(0);
+  const PER=15;
+  const all=filter==="All"?db.posts:db.posts.filter(p=>p.category===filter);
+  const slice=all.slice(pg*PER,(pg+1)*PER);
+  const total=Math.ceil(all.length/PER);
+  const counts=["All",...CATS].reduce((a,c)=>{a[c]=c==="All"?db.posts.length:db.posts.filter(p=>p.category===c).length;return a;},{});
+  return(
+    <div>
+      <StoriesBar/>
+      <Composer/>
+      <div className="filters">
+        {["All",...CATS].map(f=>(
+          <button key={f} className={`fchip${filter===f?" on":""}`} onClick={()=>{setFilter(f);setPg(0);}}>
+            {f}<span className="fcnt">{counts[f]}</span>
+          </button>
+        ))}
+      </div>
+      {slice.map(p=><Post key={p.id} post={p}/>)}
+      {total>1&&(
+        <div className="pager">
+          <button className="pg" onClick={()=>setPg(Math.max(0,pg-1))} disabled={pg===0}>←</button>
+          {Array.from({length:Math.min(total,10)},(_,i)=>(
+            <button key={i} className={`pg${pg===i?" cur":""}`} onClick={()=>setPg(i)}>{i+1}</button>
+          ))}
+          {total>10&&<span style={{color:"var(--t4)",fontSize:".72rem"}}>…{total}</span>}
+          <button className="pg" onClick={()=>setPg(Math.min(total-1,pg+1))} disabled={pg>=total-1}>→</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── WATCH PAGE ───────────────────────────────────────────────────────
+function WatchPage(){
+  const{db}=useStore();
+  const videos=db.posts.filter(p=>p.type==="video");
+  return(
+    <div>
+      <div className="page-hd">
+        <div className="page-ey">VIDEO CONTENT</div>
+        <h1 className="page-ti">Watch</h1>
+        <div className="page-rule" style={{background:"linear-gradient(90deg,var(--red),var(--o1))"}}/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))",gap:"1rem"}}>
+        {videos.map(v=>(
+          <div key={v.id} style={{background:"var(--card)",border:"1px solid var(--border)",borderRadius:12,overflow:"hidden",cursor:"pointer",transition:"all .14s",backdropFilter:"blur(16px)"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor="var(--border-o)";e.currentTarget.style.transform="translateY(-3px)"}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--border)";e.currentTarget.style.transform="none"}}>
+            <div style={{height:175,background:"linear-gradient(135deg,#1a0c00,#050505)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:".75rem"}}>
+              <div style={{width:52,height:52,borderRadius:"50%",background:"var(--og1)",border:"2px solid var(--o1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.3rem"}}>▶</div>
+              <span style={{fontSize:".62rem",letterSpacing:1.5,color:"var(--o3)",fontWeight:600}}>{v.videoLabel}</span>
+            </div>
+            <div style={{padding:".85rem 1rem"}}>
+              <div style={{color:"var(--t1)",fontSize:".88rem",fontWeight:600,lineHeight:1.5,marginBottom:".35rem"}}>{v.content.slice(0,90)}…</div>
+              <div style={{display:"flex",gap:".5rem",alignItems:"center"}}>
+                <Avi initials={v.userAvatar} size={20} uid={v.userId}/>
+                <span style={{color:"var(--t2)",fontSize:".75rem"}}>{v.userName}</span>
+                <span style={{color:"var(--t4)",fontSize:".65rem"}}>· 👁 {v.views?.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── GALLERY PAGE ─────────────────────────────────────────────────────
+const GPALS=[["#020d14","#0099FF"],["#0d0819","#FF8C00"],["#110c00","#D4AF37"],["#00110a","#00CC88"],["#130202","#FF3B3B"]];
+function GalleryPage(){
+  const{db}=useStore();
+  const items=db.posts.filter(p=>p.category==="Social").slice(0,80);
+  const ratios=["100%","125%","75%","133%"];
+  return(
+    <div>
+      <div className="page-hd">
+        <div className="page-ey">DIGITAL COLLECTION</div>
+        <h1 className="page-ti">Gallery</h1>
+        <div className="page-rule"/>
+      </div>
+      <div className="masonry">
+        {items.map((item,i)=>{
+          const[bg,ac]=GPALS[i%5];
+          return(
+            <div key={item.id} className="mitem" style={{background:bg,borderColor:`${ac}18`}}>
+              <div className="mface" style={{paddingTop:ratios[i%4]}}>
+                <div className="minner"><p className="mtext" style={{color:ac}}>{item.content.slice(0,100)}…</p></div>
+              </div>
+              <div className="mfoot" style={{borderTop:`1px solid ${ac}14`}}>
+                <span className="mauthor" style={{color:ac}}>{item.userName}</span>
+                <span className="mlikes">♥ {Object.values(item.reactions||{}).flat().length}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── MARKET PAGE ──────────────────────────────────────────────────────
+const TBGS=["linear-gradient(135deg,#1a0c00,#040404)","linear-gradient(135deg,#0a1a00,#040404)","linear-gradient(135deg,#1a001a,#040404)","linear-gradient(135deg,#001a1a,#040404)","linear-gradient(135deg,#1a1a00,#040404)"];
+const EMJS=["💎","⌚","🏎️","💼","🏠","👜","🛥️","✈️","🍾","🏆","🎨","💍","🖼️","⛵","🌴"];
+function MarketPage(){
+  const{db}=useStore();
+  const items=db.posts.filter(p=>p.category==="Marketplace").slice(0,100);
+  return(
+    <div>
+      <div className="page-hd">
+        <div className="page-ey">CURATED ACQUISITIONS</div>
+        <h1 className="page-ti">Luxury Marketplace</h1>
+        <div className="page-rule" style={{background:"linear-gradient(90deg,var(--o1),#D4AF37)"}}/>
+      </div>
+      <div className="mgrid">
+        {items.map((item,i)=>(
+          <div key={item.id} className="mcard">
+            <div className="mthumb" style={{background:TBGS[i%5]}}>{EMJS[i%EMJS.length]}</div>
+            <div className="mbody">
+              <div className="mlbl">LUXURY ACQUISITION</div>
+              <p className="mtext2">{item.content.slice(0,110)}…</p>
+              <div className="mfooter">
+                <span className="mby">{item.userName}</span>
+                <button className="btn btn-p btn-sm">INQUIRE</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── MESSAGES PAGE ────────────────────────────────────────────────────
+function MessagesPage(){
+  const{user,db,sendMessage,getConvo}=useStore();
+  const[sel,setSel]=useState(null);
+  const[txt,setTxt]=useState("");
+  const msgsRef=useRef(null);
+  const contacts=db?.users?.filter(u=>u.id!==user.id)||[];
+  const convo=sel?getConvo(sel.id):[];
+  useEffect(()=>{msgsRef.current?.scrollTo(0,msgsRef.current.scrollHeight);},[convo.length]);
+  const send=()=>{if(!txt.trim()||!sel)return;sendMessage(sel.id,txt);setTxt("");};
+  return(
+    <div className="inbox-wrap">
+      <div className="inbox-list">
+        <div className="inbox-hdr">CONVERSATIONS</div>
+        <div className="contacts">
+          {contacts.map(c=>(
+            <div key={c.id} className={`contact${sel?.id===c.id?" on":""}`} onClick={()=>setSel(c)}>
+              <Avi initials={c.avatar} size={34} uid={c.id}/>
+              <div style={{flex:1,overflow:"hidden"}}>
+                <div className="cname">{c.name}</div>
+                <div className="cprev">{c.bio?.slice(0,28)||"Click to message"}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="chat-pane">
+        {sel?(
+          <>
+            <div className="chat-hdr">
+              <Avi initials={sel.avatar} size={34} uid={sel.id}/>
+              <div>
+                <div className="chat-nm">{sel.name}{sel.verified&&<span style={{color:"var(--o1)",marginLeft:3}}>✓</span>}</div>
+                <div className="chat-online">● Active now</div>
+              </div>
+            </div>
+            <div className="chat-msgs" ref={msgsRef}>
+              {convo.length===0&&<div className="chat-empty">Start the conversation.</div>}
+              {convo.map(m=>(
+                <div key={m.id} style={{display:"flex",flexDirection:"column",alignItems:m.from===user.id?"flex-end":"flex-start"}}>
+                  <div className={`msg ${m.from===user.id?"s":"r"}`}>{m.text}</div>
+                  <span className="msg-time">{timeAgo(m.timestamp)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="chat-input-row">
+              <input className="chat-inp" value={txt} onChange={e=>setTxt(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder={`Message ${sel.name}…`}/>
+              <button className="btn btn-p btn-sm" onClick={send}>SEND</button>
+            </div>
+          </>
+        ):(
+          <div className="chat-empty">Select a contact to begin messaging.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── TIMELINE PAGE ────────────────────────────────────────────────────
+function TimelinePage(){
+  const{db,timeline,setPage,user:cu,banUser}=useStore();
+  const subject=db?.users?.find(u=>u.id===timeline);
+  const userPosts=db?.posts?.filter(p=>p.userId===timeline)||[];
+  const isAdmin=cu?.role==="admin";
+  if(!subject)return(<div><button className="back-btn" onClick={()=>setPage("feed")}>← Back</button><div className="empty">User not found.</div></div>);
+  const tr=userPosts.reduce((a,p)=>a+Object.values(p.reactions||{}).flat().length,0);
+  return(
+    <div>
+      <button className="back-btn" onClick={()=>setPage("feed")}>← Back to Feed</button>
+      <div className="scard" style={{padding:0,overflow:"hidden",marginBottom:"1rem"}}>
+        <div className="tl-banner"/>
+        <div className="tl-body">
+          <div className="tl-avi"><Avi initials={subject.avatar} size={72} uid={subject.id}/></div>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",flexWrap:"wrap",gap:"1rem"}}>
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:".5rem"}}>
+                <span className="tl-name">{subject.name}</span>
+                {subject.verified&&<span style={{color:"var(--o1)",fontSize:"1rem"}}>✓</span>}
+              </div>
+              <div className="tl-bio">{subject.bio}</div>
+            </div>
+            <div style={{display:"flex",gap:".5rem"}}>
+              {isAdmin&&!subject.suspended&&(
+                <button className="btn btn-d" onClick={()=>{if(window.confirm(`Suspend ${subject.name}?`))banUser(subject.id);}}>🔒 Suspend</button>
+              )}
+              <button className="btn btn-p btn-sm">Follow</button>
+            </div>
+          </div>
+          <div className="tl-stats">
+            <div><div className="ts-v">{userPosts.length}</div><div className="ts-l">POSTS</div></div>
+            <div><div className="ts-v">{tr}</div><div className="ts-l">REACTIONS</div></div>
+            <div><div className="ts-v">{subject.followers?.toLocaleString()}</div><div className="ts-l">FOLLOWERS</div></div>
+            <div><div className="ts-v">{subject.following}</div><div className="ts-l">FOLLOWING</div></div>
+          </div>
+          <div style={{marginTop:".5rem",fontSize:".7rem",color:"var(--t4)"}}>Joined {subject.joined}</div>
+        </div>
+      </div>
+      <div style={{fontSize:".6rem",letterSpacing:3,color:"var(--t4)",marginBottom:"1rem",fontWeight:700}}>POSTS ({userPosts.length})</div>
+      {userPosts.length===0&&<div className="empty">No posts yet.</div>}
+      {userPosts.map(p=><Post key={p.id} post={p} adminMode={isAdmin}/>)}
+    </div>
+  );
+}
+
+// ── ADMIN PANEL ──────────────────────────────────────────────────────
+function AdminPanel(){
+  const{db,banUser,reinstateUser,removePost}=useStore();
+  const[tab,setTab]=useState("flagged");
+  const flagged=db?.posts?.filter(p=>p.flagged)||[];
+  const suspended=db?.users?.filter(u=>u.suspended)||[];
+  const stats=[
+    {v:db?.posts?.length||0,l:"Total Posts",c:"var(--o1)"},
+    {v:flagged.length,l:"Flagged",c:"var(--red)"},
+    {v:db?.users?.length||0,l:"Members",c:"var(--o3)"},
+    {v:suspended.length,l:"Suspended",c:"var(--red)"},
+    {v:db?.messages?.length||0,l:"Messages",c:"var(--blue)"},
+  ];
+  return(
+    <div>
+      <div className="admin-hd-row">
+        <span style={{fontSize:"2rem"}}>⚡</span>
+        <div>
+          <div className="admin-title">GOD-MODE ADMIN</div>
+          <div className="admin-sub">CHIEF ADMINISTRATOR — FULL SYSTEM CONTROL</div>
+        </div>
+      </div>
+      <div className="stats-grid">
+        {stats.map(s=>(
+          <div key={s.l} className="stat-box" style={{borderColor:`${s.c}20`}}>
+            <div className="stat-val" style={{color:s.c}}>{s.v.toLocaleString()}</div>
+            <div className="stat-lbl">{s.l}</div>
+          </div>
+        ))}
+      </div>
+      <div className="atabs">
+        {[["flagged","🚩 Flagged Posts"],["users","👥 All Members"],["suspended","🔒 Suspended"]].map(([id,lbl])=>(
+          <button key={id} className={`atab${tab===id?" on":""}`} onClick={()=>setTab(id)}>{lbl}</button>
+        ))}
+      </div>
+      {tab==="flagged"&&(
+        <div>
+          {flagged.length===0&&<div className="empty">No flagged content.</div>}
+          {flagged.map(post=>(
+            <div key={post.id} className="fcard">
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:".5rem",marginBottom:".65rem"}}>
+                <div>
+                  <div className="flbl">⚠ COMMUNITY VIOLATION DETECTED</div>
+                  <div className="fuser">{post.userName}</div>
+                  <div className="fkw">Keyword: "{post.flagReason}" · {timeAgo(post.timestamp)}</div>
+                </div>
+                <div style={{display:"flex",gap:".4rem"}}>
+                  <button className="btn btn-d btn-sm" onClick={()=>{if(window.confirm(`Suspend ${post.userName}?`))banUser(post.userId);}}>🔒 Ban User</button>
+                  <button className="btn btn-g btn-sm" onClick={()=>{if(window.confirm("Remove post?"))removePost(post.id);}}>Remove</button>
+                </div>
+              </div>
+              <div className="fquote">{post.content}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {tab==="users"&&(
+        <div>
+          {db?.users?.map(u=>(
+            <div key={u.id} className={`urow${u.suspended?" sus":""}`}>
+              <div style={{display:"flex",gap:".65rem",alignItems:"center",flexWrap:"wrap"}}>
+                <Avi initials={u.avatar} size={36} uid={u.id}/>
+                <div>
+                  <div className="unm">{u.name}{u.verified&&<span style={{color:"var(--o1)",marginLeft:3}}>✓</span>}</div>
+                  <div className="uph">{u.phone} · {u.role}</div>
+                </div>
+                {u.suspended&&<span className="sus-badge">SUSPENDED</span>}
+              </div>
+              {!u.suspended
+                ?<button className="btn btn-d btn-sm" onClick={()=>{if(window.confirm(`Suspend ${u.name}?`))banUser(u.id);}}>🔒 Suspend</button>
+                :<button className="btn btn-g btn-sm" onClick={()=>reinstateUser(u.id)}>Reinstate</button>
+              }
+            </div>
+          ))}
+        </div>
+      )}
+      {tab==="suspended"&&(
+        <div>
+          {suspended.length===0&&<div className="empty">No suspended accounts.</div>}
+          {suspended.map(u=>(
+            <div key={u.id} className="urow sus">
+              <div style={{display:"flex",gap:".65rem",alignItems:"center"}}>
+                <Avi initials={u.avatar} size={36} uid={u.id}/>
+                <div><div className="unm" style={{color:"var(--t3)"}}>{u.name}</div><div className="uph">{u.phone}</div></div>
+              </div>
+              <button className="btn btn-g btn-sm" onClick={()=>reinstateUser(u.id)}>Reinstate</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── PAGE ROUTER ──────────────────────────────────────────────────────
+function PageContent(){
+  const{page,user}=useStore();
+  if(page==="admin"&&user.role==="admin")return<AdminPanel/>;
+  if(page==="timeline")return<TimelinePage/>;
+  if(page==="watch")return<WatchPage/>;
+  if(page==="gallery")return<GalleryPage/>;
+  if(page==="market")return<MarketPage/>;
+  if(page==="messages")return<MessagesPage/>;
+  return<FeedPage/>;
+}
+
+// ── APP ──────────────────────────────────────────────────────────────
+function AppInner(){
+  const{db,user,suspended}=useStore();
+  const[settings,setSettings]=useState(false);
+  if(suspended)return<SuspendedScreen/>;
+  if(!db)return<div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--t4)",letterSpacing:4,fontSize:".72rem"}}>INITIALIZING…</div>;
+  if(!user)return<AuthScreen/>;
+  return(
+    <>
+      <Navbar onSettings={()=>setSettings(true)}/>
+      <div className="layout">
+        <SidebarLeft/>
+        <main><PageContent/></main>
+        <SidebarRight/>
+      </div>
+      {settings&&<Settings onClose={()=>setSettings(false)}/>}
+    </>
+  );
+}
+
+function App(){
+  return(
+    <StoreProvider>
+      <AppInner/>
+    </StoreProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
